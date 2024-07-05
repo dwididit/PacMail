@@ -37,7 +37,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
             set -e
-            APP_STG_PATH="/home/ubuntu/pacmailstaging"
+            APP_STG_PATH="${{ vars.APP_STG_PATH }}"
             if [ -d "$APP_STG_PATH" ]; then
               cd $APP_STG_PATH
               sudo docker-compose down --remove-orphans --timeout 60 || true
@@ -66,7 +66,7 @@ jobs:
 
       - name: Test Hit Endpoint
         run: |
-          curl http://108.136.118.235:3000 || (
+          curl -f https://${{ secrets.STG_URL }} || (
             echo "Fetching docker logs for backend and frontend..."
             sudo docker logs backend
             sudo docker logs frontend
