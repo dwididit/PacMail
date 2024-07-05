@@ -3,42 +3,58 @@ name: Deploy Staging 🚀
 on:
   push:
     branches:
-      - master
+      - staging
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    environment: staging
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.10'
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '14'
 
+      - name: Create .env file for backend
+        run: |
+          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > ./backend/.env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> ./backend/.env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> ./backend/.env
+
+      - name: Create .env file for frontend
+        run: |
+          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" > ./frontend/.env
+
       - name: Install Node.js dependencies
         run: npm install
         working-directory: ./frontend
 
       - name: Build React application
-        run: npm run build
+        run: |
+          CI=false npm run build
         working-directory: ./frontend
 
-      - name: Build Docker image
+      - name: Build and Run application
         run: |
-          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pacmail-backend:staging ./backend
-          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pacmail-backend:staging
+          cat ./backend/.env
+          cat ./frontend/.env
+          sudo docker-compose --env-file ./backend/.env up --build --detach
 
-      - name: Deploy to Staging
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST_STAGING }}
-          username: ${{ secrets.SSH_USER_NAME_STAGING }}
-          key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
-          script: |
-            cd ${{ secrets.APP_STG_PATH }}
-            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pacmail-backend:staging
-            docker-compose -f docker-compose.staging.yml up -d --build
+      - name: Test Hit Endpoint
+        run: |
+          sleep 10
+          curl http://localhost:3001 || (
+            echo "Fetching docker logs for backend and frontend..."
+            sudo docker logs backend
+            sudo docker logs frontend
+            exit 1
+          )
