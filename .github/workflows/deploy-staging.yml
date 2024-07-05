@@ -1,0 +1,44 @@
+name: Deploy Staging 🚀
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: ./frontend
+
+      - name: Build React application
+        run: npm run build
+        working-directory: ./frontend
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/pacmail-backend:staging ./backend
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login --username ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/pacmail-backend:staging
+
+      - name: Deploy to Staging
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST_STAGING }}
+          username: ${{ secrets.SSH_USER_NAME_STAGING }}
+          key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
+          script: |
+            cd ${{ secrets.APP_STG_PATH }}
+            docker pull ${{ secrets.DOCKERHUB_USERNAME }}/pacmail-backend:staging
+            docker-compose -f docker-compose.staging.yml up -d --build
