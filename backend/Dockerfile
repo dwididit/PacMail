@@ -13,8 +13,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the working directory contents into the container at /app
 COPY . .
 
-# Make port 5005 available to the world outside this container
-EXPOSE 5005
+# Copy the wait script into the container
+COPY wait-for-it.sh /app/wait-for-it.sh
 
-# Run api.py when the container launches
-CMD ["python3", "api.py"]
+# Make port 5000 available to the world outside this container
+EXPOSE 5000
+
+# Run the wait script and api.py when the container launches
+CMD ["./wait-for-it.sh", "python3", "api.py"]
