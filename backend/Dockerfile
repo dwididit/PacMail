@@ -10,17 +10,11 @@ COPY requirements.txt .
 # Install any dependencies specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install netcat
-RUN apt-get update && apt-get install -y netcat
-
 # Copy the rest of the working directory contents into the container at /app
 COPY . .
-
-# Make the wait script executable
-RUN chmod +x /app/wait-for-it.sh
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
-# Run the wait script and api.py when the container launches
-CMD ["./wait-for-it.sh", "python3", "api.py"]
+# Run api.py when the container launches
+CMD ["python3", "api.py"]
