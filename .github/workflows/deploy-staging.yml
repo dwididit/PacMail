@@ -3,7 +3,7 @@ name: Deploy Staging 🚀
 on:
   push:
     branches:
-      - staging
+      - master
 
 jobs:
   build-and-deploy:
