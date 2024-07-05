@@ -14,7 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Copy the wait script into the container
-COPY wait-for-it.sh /app/wait-for-it.sh
+COPY ../wait-for-it.sh /app/wait-for-it.sh
 
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
