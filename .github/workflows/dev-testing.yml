@@ -52,4 +52,9 @@ jobs:
       - name: Test Hit Endpoint
         run: |
           sleep 10
-          curl http://localhost:5005
+          curl http://localhost:5005 || (
+            echo "Fetching docker logs for backend and frontend..."
+            docker logs backend
+            docker logs frontend
+            exit 1
+          )
