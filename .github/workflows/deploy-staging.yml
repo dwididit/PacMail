@@ -43,21 +43,14 @@ jobs:
             echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
             echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
             echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
-            echo "STG_APP_PORT=${{ secrets.STG_APP_PORT }}" >> .env
             sudo docker-compose --env-file .env up --build --detach
 
       - name: Wait for the application to start
-        run: sleep 30
-
-      - name: Fetch Docker Logs for Backend
-        run: sudo docker logs backend
-
-      - name: Fetch Docker Logs for Frontend
-        run: sudo docker logs frontend
+        run: sleep 10
 
       - name: Test Hit Endpoint
         run: |
-          curl -f "http://${{ secrets.STG_URL }}:${{ secrets.STG_APP_PORT }}" || (
+          curl -f http://${{ secrets.STG_URL }}:3000 || (
             echo "Fetching docker logs for backend and frontend..."
             sudo docker logs backend
             sudo docker logs frontend
