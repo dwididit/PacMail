@@ -16,7 +16,6 @@ services:
       - "3000:3000"
     environment:
       REACT_APP_API_URL: ${REACT_APP_API_URL}
-    network_mode: "host"
 
   backend:
     build:
@@ -33,7 +32,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
-    network_mode: "host"
+    ports:
+      - "5005:5005"
 
   database:
     image: postgres:13
@@ -46,7 +46,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    network_mode: "host"
+    ports:
+      - "5432:5432"
 
 volumes:
   postgres_data:
