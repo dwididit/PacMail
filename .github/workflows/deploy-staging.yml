@@ -52,7 +52,7 @@ jobs:
       - name: Test Hit Endpoint
         run: |
           sleep 10
-          curl http://localhost:3001 || (
+          curl ${{ secrets.STG_URL }} || (
             echo "Fetching docker logs for backend and frontend..."
             sudo docker logs backend
             sudo docker logs frontend
