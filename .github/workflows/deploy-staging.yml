@@ -19,16 +19,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
-      - name: Create .env file for backend
-        run: |
-          echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" > backend/.env
-          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> backend/.env
-          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> backend/.env
-
-      - name: Create .env file for frontend
-        run: |
-          echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" > frontend/.env
-
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
         with:
@@ -48,11 +38,14 @@ jobs:
               git clone ${{ secrets.GIT_URL }} $APP_STG_PATH
               cd $APP_STG_PATH
             fi
-            cp backend/.env $APP_STG_PATH/backend/.env
-            cp frontend/.env $APP_STG_PATH/frontend/.env
-            sudo docker-compose up --build --detach
+            touch .env
+            echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
+            echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+            echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+            echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
+            sudo docker-compose --env-file .env up --build --detach
 
-      - name: Wait for services to be ready
+      - name: Wait for the application to start
         run: sleep 30
 
       - name: Fetch Docker Logs for Backend
