@@ -49,6 +49,11 @@ jobs:
           cat ./frontend/.env
           sudo docker-compose --env-file ./backend/.env up --build --detach
 
+      - name: Wait for services to be ready
+        run: |
+          sleep 30
+          docker ps -a
+
       - name: Test Hit Endpoint
         run: |
           sleep 10
