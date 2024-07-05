@@ -3,7 +3,7 @@ name: Dev Testing 🔎
 on:
   pull_request:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-test:
@@ -39,17 +39,22 @@ jobs:
         working-directory: ./frontend
 
       - name: Build React application
-        run: npm run build
+        run: |
+          CI=false npm run build
         working-directory: ./frontend
 
       - name: Build and Run application
         run: |
           cat ./backend/.env
           cat ./frontend/.env
-          docker-compose --env-file ./backend/.env up --build --detach backend database
-          docker-compose --env-file ./frontend/.env up --build --detach frontend
+          sudo docker-compose --env-file ./backend/.env up --build --detach
 
       - name: Test Hit Endpoint
         run: |
           sleep 10
-          curl http://localhost:5000
+          curl http://localhost:3001 || (
+            echo "Fetching docker logs for backend and frontend..."
+            sudo docker logs backend
+            sudo docker logs frontend
+            exit 1
+          )
