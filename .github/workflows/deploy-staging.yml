@@ -27,16 +27,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
             set -e
-            APP_STG_PATH="${{ vars.APP_STG_PATH }}"
-            if [ -d "$APP_STG_PATH" ]; then
-              cd $APP_STG_PATH
+            MYAPP_STG_PATH="${{ vars.MYAPP_STG_PATH }}"
+            if [ -d "$MYAPP_STG_PATH" ]; then
+              cd $MYAPP_STG_PATH
               sudo docker-compose down --remove-orphans --timeout 60 || true
               git pull origin master
             else
-              mkdir -p $APP_STG_PATH
+              mkdir -p $MYAPP_STG_PATH
               ssh-keyscan github.com >> ~/.ssh/known_hosts
-              git clone ${{ secrets.GIT_URL }} $APP_STG_PATH
-              cd $APP_STG_PATH
+              git clone ${{ secrets.GIT_URL }} $MYAPP_STG_PATH
+              cd $MYAPP_STG_PATH
             fi
             touch .env
             echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
