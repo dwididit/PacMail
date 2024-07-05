@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  build-and-deploy:
+  deploy-to-staging:
     runs-on: ubuntu-latest
     environment: staging
 
@@ -43,6 +43,7 @@ jobs:
             echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
             echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
             echo "REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }}" >> .env
+            echo "STG_APP_PORT=${{ secrets.STG_APP_PORT }}" >> .env
             sudo docker-compose --env-file .env up --build --detach
 
       - name: Wait for the application to start
@@ -56,7 +57,7 @@ jobs:
 
       - name: Test Hit Endpoint
         run: |
-          curl -f http://${{ secrets.STG_URL }}:3000 || (
+          curl -f "http://${{ secrets.STG_URL }}:${{ secrets.STG_APP_PORT }}" || (
             echo "Fetching docker logs for backend and frontend..."
             sudo docker logs backend
             sudo docker logs frontend
