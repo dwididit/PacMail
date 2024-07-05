@@ -47,10 +47,9 @@ jobs:
         run: |
           cat ./backend/.env
           cat ./frontend/.env
-          docker-compose --env-file ./backend/.env up --build --detach backend database
-          docker-compose --env-file ./frontend/.env up --build --detach frontend
+          docker-compose --env-file ./backend/.env up --build --detach
 
       - name: Test Hit Endpoint
         run: |
           sleep 10
-          curl http://localhost:5001
+          curl http://localhost:5005
