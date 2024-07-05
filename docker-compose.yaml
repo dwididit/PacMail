@@ -12,10 +12,9 @@ services:
     depends_on:
       - backend
       - database
-    ports:
-      - "3000:3000"
     environment:
       REACT_APP_API_URL: ${REACT_APP_API_URL}
+    network_mode: "host"
 
   backend:
     build:
