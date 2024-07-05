@@ -43,6 +43,7 @@ jobs:
               sudo docker-compose down --remove-orphans --timeout 60 || true
               git pull origin master
             else
+              mkdir -p $APP_STG_PATH
               ssh-keyscan github.com >> ~/.ssh/known_hosts
               git clone ${{ secrets.GIT_URL }} $APP_STG_PATH
               cd $APP_STG_PATH
@@ -59,7 +60,7 @@ jobs:
 
       - name: Test Hit Endpoint
         run: |
-          curl ${{ secrets.STG_URL }} || (
+          curl http://108.136.118.235:3000 || (
             echo "Fetching docker logs for backend and frontend..."
             sudo docker logs backend
             sudo docker logs frontend
