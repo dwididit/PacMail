@@ -51,6 +51,12 @@ jobs:
       - name: Wait for services to be ready
         run: sleep 30
 
+      - name: Fetch Docker Logs for Backend
+        run: sudo docker logs backend
+
+      - name: Fetch Docker Logs for Frontend
+        run: sudo docker logs frontend
+
       - name: Test Hit Endpoint
         run: |
           curl ${{ secrets.STG_URL }} || (
