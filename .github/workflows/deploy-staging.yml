@@ -1,9 +1,9 @@
-name: Deploy Staging 🚀
+name: Staging Deployment
 
 on:
   push:
     branches:
-      - master
+      - staging
 
 jobs:
   build-and-deploy:
@@ -56,7 +56,6 @@ jobs:
 
       - name: Test Hit Endpoint
         run: |
-          sleep 10
           curl ${{ secrets.STG_URL }} || (
             echo "Fetching docker logs for backend and frontend..."
             sudo docker logs backend
