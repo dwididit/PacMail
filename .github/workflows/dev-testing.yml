@@ -53,4 +53,4 @@ jobs:
       - name: Test Hit Endpoint
         run: |
           sleep 10
-          curl http://localhost:5000
+          curl http://localhost:5001
