@@ -10,6 +10,9 @@ COPY requirements.txt .
 # Install any dependencies specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Install netcat
+RUN apt-get update && apt-get install -y netcat
+
 # Copy the rest of the working directory contents into the container at /app
 COPY . .
 
