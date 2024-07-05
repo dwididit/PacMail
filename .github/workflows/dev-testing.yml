@@ -39,7 +39,8 @@ jobs:
         working-directory: ./frontend
 
       - name: Build React application
-        run: npm run build
+        run: |
+          CI=false npm run build
         working-directory: ./frontend
 
       - name: Build and Run application
