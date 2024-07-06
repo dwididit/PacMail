@@ -30,7 +30,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
             set -e
-            echo "MYAPP_STG_PATH is set to: $MYAPP_STG_PATH"
+            MYAPP_STG_PATH="/home/ubuntu/pacmailstaging"
             if [ -d "$MYAPP_STG_PATH" ]; then
               cd $MYAPP_STG_PATH
               sudo docker-compose down --remove-orphans --timeout 60 || true
