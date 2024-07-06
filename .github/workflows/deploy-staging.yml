@@ -14,13 +14,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup SSH
+      - name: Setup SSH for Server Login
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
-      - name: Test SSH Connection
-        run: ssh -T ${{ secrets.SSH_USER_NAME_STAGING }}@${{ secrets.SSH_HOST_STAGING }} || exit 1
+      - name: Test SSH Connection to Server
+        run: ssh -o StrictHostKeyChecking=no -T ${{ secrets.SSH_USER_NAME_STAGING }}@${{ secrets.SSH_HOST_STAGING }} || exit 1
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
@@ -30,7 +30,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
             set -e
-            APP_STG_PATH="${{ vars.APP_STG_PATH }}"
+            APP_STG_PATH="${{ secrets.APP_STG_PATH }}"
             if [ -d "$APP_STG_PATH" ]; then
               cd $APP_STG_PATH
               sudo docker-compose down --remove-orphans --timeout 60 || true
