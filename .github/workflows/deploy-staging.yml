@@ -14,20 +14,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Setup SSH for Deploy Keys
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_DEPLOY }}
-
-      - name: Test SSH Connection for Deploy Keys
-        run: ssh -T git@github.com || exit 1
-
-      - name: Setup SSH for Server Login
+      - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
-      - name: Test SSH Connection for Server Login
+      - name: Test SSH Connection
         run: ssh -T ${{ secrets.SSH_USER_NAME_STAGING }}@${{ secrets.SSH_HOST_STAGING }} || exit 1
 
       - name: Run deployment script on staging server
@@ -38,7 +30,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
             set -e
-            APP_STG_PATH="/home/ubuntu/staging"
+            APP_STG_PATH="${{ vars.APP_STG_PATH }}"
             if [ -d "$APP_STG_PATH" ]; then
               cd $APP_STG_PATH
               sudo docker-compose down --remove-orphans --timeout 60 || true
@@ -57,7 +49,7 @@ jobs:
             sudo docker-compose --env-file .env up --build --detach
 
       - name: Wait for the application to start
-        run: sleep 10
+        run: sleep 30
 
       - name: Test Hit Endpoint
         run: |
