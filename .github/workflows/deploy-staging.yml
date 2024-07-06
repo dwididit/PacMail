@@ -20,7 +20,7 @@ jobs:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
 
       - name: Test SSH Connection
-        run: ssh -T git@github.com
+        run: ssh -T git@github.com || exit 1
 
       - name: Run deployment script on staging server
         uses: appleboy/ssh-action@master
@@ -30,16 +30,16 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY_STAGING }}
           script: |
             set -e
-            MYAPP_STG_PATH="${{ vars.MYAPP_STG_PATH }}"
-            if [ -d "$MYAPP_STG_PATH" ]; then
-              cd $MYAPP_STG_PATH
+            APP_STG_PATH="/home/ubuntu/staging"
+            if [ -d "$APP_STG_PATH" ]; then
+              cd $APP_STG_PATH
               sudo docker-compose down --remove-orphans --timeout 60 || true
               git pull origin master
             else
-              mkdir -p $MYAPP_STG_PATH
+              mkdir -p $APP_STG_PATH
               ssh-keyscan github.com >> ~/.ssh/known_hosts
-              git clone ${{ secrets.GIT_URL }} $MYAPP_STG_PATH
-              cd $MYAPP_STG_PATH
+              git clone ${{ secrets.GIT_URL }} $APP_STG_PATH
+              cd $APP_STG_PATH
             fi
             touch .env
             echo "POSTGRES_DB=${{ secrets.POSTGRES_DB }}" >> .env
